@@ -4,17 +4,28 @@
 // };
 
 // But instead we're going to implement it from scratch:
-var getElementsByClassName = function(className){
-  var elements = document.body.getElementsByTagName("*");
-    var filtElements = [];
-    for (var i = 0; i < elements.length; i++) {
-        var classes = elements[i].classList;
-        if (classes.contains(className)){
-        filtElements.push(elements[i]);
-        }
+var getElementsByClassName = function (classname) {
+    var collection = document.body;
+    var results = [];
+    var search = function (collection){
+        for (var i = 0; i<collection.childNodes.length; i++){
+            if(collection.childNodes[i].classList !== undefined){ 
+                for (var j = 0; j < collection.childNodes[i].classList.length; j++){
+                    if (collection.childNodes[i].classList[j] === classname){
+                        results.push(collection.childNodes[i]);
+                    }
+                }
+            }
+            if(collection.childNodes[i].childNodes.length > 0){
+                search(collection.childNodes[i]);
+            }
+         }
     }
-    return filtElements;
-    }
+    search(collection);
+    return results;
+}
+
+
 
   	// should use: 
 	  	// document.body

@@ -2,52 +2,33 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to write it from scratch:
-var stringifyJSON = function(obj, replacer) {
-
-// if they use a replacer function. Not sure how to use it with arrays or a filter  
-  	if (replacer) {
-  		obj = replacer(obj);
-    }
-// for array    	
-  	if (Array.isArray(obj)){
-      	strArray = [];
-      	for (var i = 0; i < obj.length; i++){
-        	strArray.push('"' + obj[i].toString() + '"');      
-      	}
-      	return "[" + strArray + "]";
-
-// for an object  
-  	} else if (typeof obj === "object") {
-  	var objKeys = Object.keys(obj);
-  	var keyValArray = [];
-    for (var i = 0; i < objKeys.length; i++){
-      	var keyValString = '"' + objKeys[i] + '":';
-      	var objVal = obj[objKeys[i]];
-        if (typeof objVal == "string") {
-        	keyValString = keyValString + '"' + objVal + '"';
-        } else {
-        	keyValString = keyValString + stringifyJSON(objVal);
+var stringifyJSON = function(collection) {
+    if (collection === null || typeof collection !== "object"){
+        if(typeof collection == "string"){
+            return '"' + collection + '"';
+        }else {
+            return '' + collection;
         }
-      	keyValArray.push(keyValString);
+    }else if(Array.isArray(collection)){
+        var resultA = [];
+        for(var i = 0; i < collection.length; i++){
+            if(typeof collection[i] === "string"){
+                resultA.push('"' + collection[i] + '"');
+            }else{
+            resultA.push(stringifyJSON(collection[i]))
+            }
+        }
+        return '[' + resultA.join(',') + ']'
+    }else{
+        var resultO = [];
+        for (var key in collection){
+            if(typeof collection[key] === "string"){
+                resultO.push(stringifyJSON(key) + ':"' + collection[key] + '"');
+            }else if(typeof collection[key] === "function" || typeof collection[key] === "undefined"){
+            }else{
+                resultO.push(stringifyJSON(key) + ':' + stringifyJSON(collection[key]));
+            }
+        }
+        return '{' + resultO.join(',') + '}';
     }
-    return "{" + keyValArray.join(",") + "}";      
-
-// for boolean
-  	} else if (typeof obj === "boolean"){
-    	return obj.toString();
-
-// for string
-  	} else if (typeof obj === "string"){
-    	return '"' + obj.toString() + '"';
-
-// for number
-  	} else if (typeof obj === "number"){
-    	return obj.toString();
-  	}
-
-};
-
-
-
-
-
+}
